@@ -21,7 +21,7 @@ export default async function TodoPage(props: PageProps<'/todo'>) {
           </Link>
         </div>
 
-        <TodoList query={search} />
+        <TodoList query={search} showAction />
       </div>
     </main>
   );
