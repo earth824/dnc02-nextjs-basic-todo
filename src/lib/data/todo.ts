@@ -39,3 +39,7 @@ export async function countTodoByStatus() {
 
   return result;
 }
+
+export async function getTodoById(id: number) {
+  return await prisma.todo.findUnique({ where: { id } });
+}

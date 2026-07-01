@@ -8,14 +8,22 @@ import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
-export default function TodoForm() {
+type TodoFormProps = {
+  defaultValues?: TodoFormInput;
+  onSubmitAction: (input: unknown) => Promise<{ success: boolean }>;
+};
+
+export default function TodoForm({
+  defaultValues = { title: '', status: 'false' },
+  onSubmitAction
+}: TodoFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm<TodoFormInput>({
     resolver: zodResolver(todoFormSchema),
-    defaultValues: { title: '', status: 'false' }
+    defaultValues
   });
 
   const [isPending, startTransition] = useTransition();
@@ -24,7 +32,7 @@ export default function TodoForm() {
 
   const onSubmit = (data: TodoFormInput) => {
     startTransition(async () => {
-      const result = await createTodo(data);
+      const result = await onSubmitAction(data);
       if (!result.success) {
         alert('Something went wrong');
         return;
@@ -39,7 +47,7 @@ export default function TodoForm() {
         <input
           type="text"
           className="px-3 py-1.5 border border-gray-200 rounded-lg outline-none w-full"
-          placeholder="Enter new task"
+          placeholder="Enter todo title"
           {...register('title')}
         />
         {errors.title && (
