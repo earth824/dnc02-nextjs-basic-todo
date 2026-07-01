@@ -1,8 +1,11 @@
 'use client';
 
+import { createTodo } from '@/lib/actions/todo';
 import { TodoFormInput, todoFormSchema } from '@/lib/schemas/todo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 export default function TodoForm() {
@@ -15,8 +18,19 @@ export default function TodoForm() {
     defaultValues: { title: '', status: 'false' }
   });
 
+  const [isPending, startTransition] = useTransition();
+
+  // const router = useRouter();
+
   const onSubmit = (data: TodoFormInput) => {
-    console.log(data);
+    startTransition(async () => {
+      const result = await createTodo(data);
+      if (!result.success) {
+        alert('Something went wrong');
+        return;
+      }
+      // router.push('/todo');
+    });
   };
 
   return (
@@ -62,7 +76,12 @@ export default function TodoForm() {
         <Link href="/todo" className="px-4 py-2 bg-gray-300 rounded-lg">
           Cancel
         </Link>
-        <button className="px-4 py-2 bg-gray-300 rounded-lg">Submit</button>
+        <button
+          className="px-4 py-2 bg-gray-300 rounded-lg"
+          disabled={isPending}
+        >
+          Submit
+        </button>
       </div>
     </form>
   );

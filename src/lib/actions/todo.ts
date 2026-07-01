@@ -2,6 +2,8 @@
 
 import prisma from '@/lib/db/prisma';
 import { transformTodoFormSchema } from '@/lib/schemas/todo';
+import { refresh, revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 export async function createTodo(input: unknown) {
   const parsed = transformTodoFormSchema.safeParse(input);
@@ -10,4 +12,12 @@ export async function createTodo(input: unknown) {
   }
 
   await prisma.todo.create({ data: parsed.data });
+  // return { success: true };
+  redirect('/todo');
+}
+
+export async function deleteTodo(id: number) {
+  await prisma.todo.delete({ where: { id } });
+  // refresh();
+  revalidatePath('/todo');
 }
